@@ -59,7 +59,8 @@ class DataSet {
     }
 
     public static String printRow(String[] row){
-        return java.util.Arrays.toString(row);
+        String rowString = java.util.Arrays.toString(row);
+        return rowString.substring(1,rowString.length()-1);
     }
 
     public void printSummary(int maxRows) {
