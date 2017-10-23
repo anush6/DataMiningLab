@@ -1,5 +1,8 @@
 package b1;
 
+import javax.xml.crypto.Data;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Preprocessor {
@@ -45,37 +48,38 @@ public class Preprocessor {
          }
      }
 
-     public void discritize(int gpa_col, int maxRows) {
-         for (String[] row: data.getRows().subList(0,data.size()>maxRows?maxRows:data.size())){
-             Float value = Float.parseFloat(row[gpa_col]);
-             System.out.println();
-             System.out.print("Continuous Value: "+value);
-             if (value < 4) {
-                 System.out.print(" Discritized Value: F");
+     public void discritize(int gpa_col, String outfile) {
+         try {
+             FileWriter writer = new FileWriter(outfile);
+             writer.write(DataSet.printRow(data.getFieldNames())+", new_grade\n");
+             for (String[] row: data.getRows()) {
+                 Float value = Float.parseFloat(row[gpa_col]);
+                 writer.write(DataSet.printRow(row)+", ");
+                 String discreteValue = "";
+                 if (value < 4) {
+                     discreteValue = "F";
+                 } else if (value >= 4 && value < 5) {
+                     discreteValue = "E";
+                 } else if (value >= 5 && value < 6) {
+                     discreteValue = "D";
+                 } else if (value >= 6 && value < 7) {
+                     discreteValue = "C";
+                 } else if (value >= 7 && value < 8) {
+                     discreteValue = "B";
+                 } else if (value >= 8 && value < 9) {
+                     discreteValue = "A";
+                 } else if (value >= 9 && value < 10) {
+                     discreteValue = "S";
+                 } else {
+                     discreteValue = "S+";
+                 }
+                 writer.write(discreteValue+"\n");
              }
-             else if (value >= 4 && value <5) {
-                 System.out.print(" Discritized Value: E");
-             }
-             else if (value >= 5 && value <6) {
-                 System.out.print(" Discritized Value: D");
-             }
-             else if (value >= 6 && value <7) {
-                 System.out.print(" Discritized Value: C");
-             }
-             else if (value >= 7 && value <8) {
-                 System.out.print(" Discritized Value: B");
-             }
-             else if (value >= 8 && value <9) {
-                 System.out.print(" Discritized Value: A");
-             }
-             else if (value >= 9 && value <10) {
-                 System.out.print(" Discritized Value: S");
-             }
-             else {
-                 System.out.print(" Discritized Value: S+");
-             }
-
-
+             writer.close();
+             System.out.println("Successfully wrote "+outfile);
+         }
+         catch (IOException e ){
+             e.printStackTrace();
          }
      }
 
@@ -122,8 +126,8 @@ public class Preprocessor {
         }
         Preprocessor dataProcessor = new Preprocessor(args[0]);
         dataProcessor.printHead();
-        //dataProcessor.aggregation(0,5);
-        //dataProcessor.discritize(5,20);
+        dataProcessor.aggregation(0,5);
+        dataProcessor.discritize(5,"discritized.csv");
         ArrayList<String[]> sample = dataProcessor.stratifiedSample(60,5);
         for(String[] row : sample.subList(0,sample.size()>10?10:sample.size())) {
              System.out.println(DataSet.printRow(row));
