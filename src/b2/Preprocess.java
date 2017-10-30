@@ -84,6 +84,7 @@ public class Preprocess {
         processor.handleMissing(4, "NA", false, false);//Month
         processor.handleMissing(5, "NA", false, true);//Year
         processor.handleMissing(6, "NA", false, false);//Gender
+        processor.handleMissing(7, "NA", true, false);//PREP_TIME
         processor.writeCSV("afterMissing.csv");
 
     }
