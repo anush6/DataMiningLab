@@ -27,8 +27,11 @@ class StrongRuleGenerator {
         for (int i = 0;i<freqItemSets.length;i++){
             String[] f_k = freqItemSets[i].split(",");
             for(String item: f_k){
+                // Add all original items to hashset
                 HashSet<Character>s = new HashSet<>();
                 for(Character c: String.join("", items).toCharArray())s.add(c);
+
+                // for each item in itemset, remove it from hashmap - remaining is consequent
                 for (Character c: item.toCharArray()){
                     s.remove(c);
                 }
@@ -57,9 +60,9 @@ class StrongRuleGenerator {
 
     public void generateFrequentSubsets()
     {
-        // Generate k-1 item sets where k = max sized item set
+        // Generate k-1 item sets and multiply - using fk_1*fk_1 strategy
         // Hence k=1 => 1 item set
-        //       k=2 => 2 item sets and so on
+        //       k=2 => 2 item sets and so on upto n-1 where n = no. of items
         for (int i = 0; i<items.length-1;i++){
                 genkitems(i);
                 String[] temp = freqItemSets[i].split(",");
@@ -95,6 +98,7 @@ class StrongRuleGenerator {
                     }
                 }
             }
+            // convert the string of the form "[a, b, c]" to "a,b,c"
             freqItemSets[k] = kitems.toString().replaceAll(" ", "");
             freqItemSets[k] = freqItemSets[k].substring(1,freqItemSets[k].length()-1);
         }
@@ -118,6 +122,5 @@ class StrongRuleGenerator {
         generator.generateFrequentSubsets();
         System.out.println("Candidate Rules:");
         generator.getRules();
-        //generator.generateStrongRules();
     }
 }
