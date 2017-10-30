@@ -1,0 +1,16 @@
+"grade","name","percent","level","label"
+"A","Steve",0.6,5,TRUE
+"C","Joe",0.5,1,FALSE
+"D","Steve",0.5,3,FALSE
+"C","Kathy",0.8,3,FALSE
+"D","Steve",0.8,5,TRUE
+"A","Steve",0.7,4,FALSE
+"C","Kathy",0.6,1,FALSE
+"B","Kathy",0.9,2,TRUE
+"D","Louis",0.9,2,FALSE
+"C","Kathy",0.8,3,FALSE
+"A","Louis",0.9,3,FALSE
+"B","Steve",0.8,3,TRUE
+"C","Joe",0.6,5,TRUE
+"D","Joe",0.7,4,TRUE
+"B","Kathy",0.5,4,FALSE

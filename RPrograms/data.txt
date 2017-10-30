@@ -1,0 +1,16 @@
+"grade"	"name"	"percent"	"level"	"label"
+"1"	"A"	"Steve"	0.6	5	TRUE
+"2"	"C"	"Joe"	0.5	1	FALSE
+"3"	"D"	"Steve"	0.5	3	FALSE
+"4"	"C"	"Kathy"	0.8	3	FALSE
+"5"	"D"	"Steve"	0.8	5	TRUE
+"6"	"A"	"Steve"	0.7	4	FALSE
+"7"	"C"	"Kathy"	0.6	1	FALSE
+"8"	"B"	"Kathy"	0.9	2	TRUE
+"9"	"D"	"Louis"	0.9	2	FALSE
+"10"	"C"	"Kathy"	0.8	3	FALSE
+"11"	"A"	"Louis"	0.9	3	FALSE
+"12"	"B"	"Steve"	0.8	3	TRUE
+"13"	"C"	"Joe"	0.6	5	TRUE
+"14"	"D"	"Joe"	0.7	4	TRUE
+"15"	"B"	"Kathy"	0.5	4	FALSE
