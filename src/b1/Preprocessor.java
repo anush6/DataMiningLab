@@ -1,4 +1,3 @@
-package b1;
 
 import javax.xml.crypto.Data;
 import java.io.FileWriter;
