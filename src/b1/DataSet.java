@@ -38,7 +38,7 @@ class DataSet {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     public void setFirstAsFields(boolean status) {

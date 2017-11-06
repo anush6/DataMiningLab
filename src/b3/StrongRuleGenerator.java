@@ -23,13 +23,15 @@ class StrongRuleGenerator {
         ArrayList<String> strongRules = new ArrayList<>();
         Double sup,conf;
         HashSet<String> rules = new HashSet<>();
-        Scanner in = new Scanner(System.in);
+        //Scanner in = new Scanner(System.in);
+        Random in = new Random();
         for (int i = 0;i<freqItemSets.length;i++){
             String[] f_k = freqItemSets[i].split(",");
             for(String item: f_k){
                 // Add all original items to hashset
                 HashSet<Character>s = new HashSet<>();
-                for(Character c: String.join("", items).toCharArray())s.add(c);
+                for(Character c: String.join("", items).toCharArray())
+                    s.add(c);
 
                 // for each item in itemset, remove it from hashmap - remaining is consequent
                 for (Character c: item.toCharArray()){
@@ -42,7 +44,7 @@ class StrongRuleGenerator {
                 if(!rules.contains(opp_rule)){
                     System.out.println(rule);
                     rules.add(rule);
-                    System.out.println("Enter support and Confidence for rule: ");
+                   // System.out.println("Enter support and Confidence for rule: ");
                     sup = in.nextDouble();
                     conf = in.nextDouble();
                     if (sup > support && conf > confidence){
