@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
 import java.io.*;
-import java.util.HashMap;
 import java.util.*;
 
 class BestSplit
@@ -17,7 +15,7 @@ class BestSplit
             BufferedReader in = new BufferedReader(new FileReader(filename));
             String line;
             while((line = in.readLine())!=null){
-                line.trim();
+                line = line.trim();
                 rows.add(line.split(","));
             }
             fields = rows.get(0);
