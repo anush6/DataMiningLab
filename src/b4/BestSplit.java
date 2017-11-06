@@ -65,11 +65,11 @@ class BestSplit
         }
         for (String node : m.keySet()){
             inner = m.get(node);
-            Double subGini = gini(inner);
+            Double innerI = isGini? gini(inner):entropy(inner);
             Double temp = 0.0;
             for(Integer i : inner.values())
                 temp+= i;
-            gainSuffix += (temp/total)*subGini;
+            gainSuffix += (temp/total)*innerI;
         }
         gain -= gainSuffix;
         return gain;
