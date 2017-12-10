@@ -134,8 +134,8 @@ class BestSplit
         System.out.println("A2 Gain- Entropy:");
         Double deltaB = gain(entropyParent,a2Count,false);
         System.out.println(deltaB);
-        if (deltaA > deltaB) System.out.println("Split by Attribute : "+fields[a2Index]);
-        else System.out.println("Split by Attribute : "+fields[a1Index]);
+        if (deltaA > deltaB) System.out.println("Split by Attribute : "+fields[a1Index]);
+        else System.out.println("Split by Attribute : "+fields[a2Index]);
     }
 
 
