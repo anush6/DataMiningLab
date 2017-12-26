@@ -10,6 +10,8 @@ import java.util.Random;
 class StrongRuleGenerator {
     Double support,confidence;
     String[] items;
+    HashSet<String> rules = new HashSet<>();
+    ArrayList<String> strongRules = new ArrayList<>();
     String [] freqItemSets;
 
     public StrongRuleGenerator(String i, double confT, double supT){
@@ -20,35 +22,63 @@ class StrongRuleGenerator {
     }
 
     public void getRules(){
-        ArrayList<String> strongRules = new ArrayList<>();
-        Double sup,conf;
-        HashSet<String> rules = new HashSet<>();
+
+
+
         //Scanner in = new Scanner(System.in);
-        Random in = new Random();
+
         for (int i = 0;i<freqItemSets.length;i++){
             String[] f_k = freqItemSets[i].split(",");
             for(String item: f_k){
-                // Add all original items to hashset
-                HashSet<Character>s = new HashSet<>();
-                for(Character c: String.join("", items).toCharArray())
-                    s.add(c);
 
-                // for each item in itemset, remove it from hashmap - remaining is consequent
-                for (Character c: item.toCharArray()){
-                    s.remove(c);
+                if(item.length() == 1){
+                    HashSet<Character> allItems = new HashSet<>();
+                    for(Character c: String.join("", items).toCharArray())
+                        allItems.add(c);
+                    allItems.remove(item.charAt(0));
+                    String anticendent = "["+ item.charAt(0)+"]";
+                    String consequent = ""+allItems.toString();
+                    String rule = anticendent+" -> "+consequent;
+                    String opp_rule = consequent+" -> "+anticendent;
+                    addRule(rule);
+                    addRule(opp_rule);
                 }
-                String anticendent = Arrays.toString(item.toCharArray());
-                String consequent = s.toString();
-                String rule = anticendent+" -> "+consequent;
-                String opp_rule = consequent+" -> "+anticendent;
-                if(!rules.contains(opp_rule)){
-                    System.out.println(rule);
-                    rules.add(rule);
-                   // System.out.println("Enter support and Confidence for rule: ");
-                    sup = in.nextDouble();
-                    conf = in.nextDouble();
-                    if (sup > support && conf > confidence){
-                        strongRules.add(rule);
+                if(item.length() == 2){
+                    String anticendent = ""+ item.charAt(0);
+                    String consequent = ""+item.charAt(1);
+                    String rule = anticendent+" -> "+consequent;
+                    String opp_rule = consequent+" -> "+anticendent;
+                    addRule(rule);
+                    addRule(opp_rule);
+                    HashSet<Character> allItems = new HashSet<>();
+                    for(Character c: String.join("", items).toCharArray()){
+                        if(!item.contains(""+c))
+                            allItems.add(c);
+                    }
+                    anticendent = "["+item.charAt(0)+", "+item.charAt(1)+"]";
+                    consequent = allItems.toString();
+                    rule = anticendent+" -> "+consequent;
+                    opp_rule = consequent+" -> "+anticendent;
+                    if(!rules.contains(opp_rule)){
+                        addRule(rule);
+                        addRule(opp_rule);
+                    }
+
+                }
+                if(item.length() == 3){
+                    HashSet<Character> allItems = new HashSet<>();
+                    for(Character c: item.toCharArray()){
+                            allItems.add(c);
+                    }
+                    for(Character c: item.toCharArray()){
+                        allItems.remove(c);
+                        String anticendent = ""+ c;
+                        String consequent = allItems.toString();
+                        String rule = anticendent+" -> "+consequent;
+                        String opp_rule = consequent+" -> "+anticendent;
+                        addRule(rule);
+                        addRule(opp_rule);
+                        allItems.add(c);
                     }
                 }
             }
@@ -59,6 +89,17 @@ class StrongRuleGenerator {
         }
     }
 
+    private void addRule(String rule){
+        Random in = new Random();
+        Double sup,conf;
+        System.out.println(rule);
+        rules.add(rule);
+        sup = in.nextDouble();
+        conf = in.nextDouble();
+        if (sup > support && conf > confidence){
+            strongRules.add(rule);
+        }
+    }
 
     public void generateFrequentSubsets()
     {

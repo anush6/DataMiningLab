@@ -55,7 +55,7 @@ public class Preprocessor {
         }
         catch(IOException e){
             System.out.println(e.getMessage());
-        }      
+        }
     }
 
     public ArrayList<String[]> stratifiedSample(int sampsize){
@@ -77,8 +77,8 @@ public class Preprocessor {
         for(String gender: genderMap.keySet()){
             ArrayList<String[]> items = genderMap.get(gender);
             int class_size = items.size();
-            System.out.println("Gender: " + gender + "Class size: " + class_size);
-            int class_samp_size = (int)Math.rint( sampsize / (float)data.size() * class_size );
+            System.out.println("Gender: " + gender + " Class size: " + class_size+"/"+data.size());
+            int class_samp_size = (int)Math.rint( (sampsize / (float)data.size()) * class_size );
             System.out.println("Gender: " + gender + "Class sample size: " + class_samp_size);
             Collections.shuffle(items);
             for(int i = 0 ; i < class_samp_size; i++)
@@ -122,7 +122,7 @@ public class Preprocessor {
         Preprocessor dataProcessor = new Preprocessor(args[0]);
         dataProcessor.aggregation(4, 2);
         dataProcessor.discretization(5, "output.csv");
-        ArrayList<String[]> sample = dataProcessor.stratifiedSample(10);
+        ArrayList<String[]> sample = dataProcessor.stratifiedSample(4);
         Collections.shuffle(sample);
         for(String[] row : sample) {
              System.out.println(dataProcessor.printRow(row));

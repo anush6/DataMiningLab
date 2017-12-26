@@ -1,135 +1,131 @@
-
-import javax.xml.crypto.Data;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class Preprocessor {
 
-     private DataSet data;
+    private ArrayList<String[]> data;
 
-     public Preprocessor(String filename) {
-         data = new DataSet(filename);
-         data.setFirstAsFields(true);
-     }
+    public Preprocessor(String filename){
+        data = new ArrayList<>();
+        parseCSV(filename);
+    }
 
-     public void printHead() {
-         data.printSummary(10);
-     }
+    public void parseCSV(String filename) {
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
+            String line;
+            while( (line = reader.readLine()) != null ){
+                String row[] = line.split(",");
+                data.add(row);
+            }
+        }
+        catch (IOException e){
+            System.out.println(e.getMessage());
+        }
+    }
 
-     public void aggregation(int group_col,int value_col) {
-         HashMap<String,Float[]> SubjectGPA = new HashMap<>();
-         for (String[] row: data.getRows()){
-             if(SubjectGPA.containsKey(row[group_col])){
-                 Float[] minmax = SubjectGPA.get(row[group_col]);
-                 Float value = Float.parseFloat(row[value_col]);
-                 if(value < minmax[0]){
-                     minmax[0] = value;
-                 }
-                 if(value > minmax[1]){
-                     minmax[1] = value;
-                 }
-                 SubjectGPA.put(row[group_col],minmax);
-             } else {
-                 try {
-                     Float value = Float.parseFloat(row[value_col]);
-                     SubjectGPA.put(row[group_col],new Float[]{value,value});
-                 }catch (Exception e){
-                     System.out.println("Exception: "+DataSet.printRow(row));
-                     e.printStackTrace();
-                 }
+    public String printRow(String row[]){
+        String new_row = Arrays.toString(row);
+        return new_row.substring(1, new_row.length() - 1);
+    }
 
-             }
-         }
-         for (String key : SubjectGPA.keySet()){
-             Float[] value = SubjectGPA.get(key);
-             System.out.println("Subject: "+key+" Min GPA: "+value[0] + " Max GPA: " + value[1]);
-         }
-     }
+    public void discretization(int col, String outputfile){
+        try {
+            FileWriter writer = new FileWriter(outputfile);
+            for(String row[] : data ){
+                Float value = Float.parseFloat(row[col]);
+                writer.write(printRow(row)+",");
+                String discreteValue = "";
+                if(value < 200)
+                    discreteValue = "A";
+                else if(value >= 200 && value < 400)
+                    discreteValue = "B";
+                else if(value >= 400 && value < 600)
+                    discreteValue = "C";
+                else if(value >= 600 && value < 800)
+                    discreteValue = "D";
+                else if(value >= 800 && value < 1000)
+                    discreteValue = "E";
+                else
+                    discreteValue = "F";
 
-     public void discritize(int gpa_col, String outfile) {
-         try {
-             FileWriter writer = new FileWriter(outfile);
-             writer.write(DataSet.printRow(data.getFieldNames())+", new_grade\n");
-             for (String[] row: data.getRows()) {
-                 Float value = Float.parseFloat(row[gpa_col]);
-                 writer.write(DataSet.printRow(row)+", ");
-                 String discreteValue = "";
-                 if (value < 4) {
-                     discreteValue = "F";
-                 } else if (value >= 4 && value < 5) {
-                     discreteValue = "E";
-                 } else if (value >= 5 && value < 6) {
-                     discreteValue = "D";
-                 } else if (value >= 6 && value < 7) {
-                     discreteValue = "C";
-                 } else if (value >= 7 && value < 8) {
-                     discreteValue = "B";
-                 } else if (value >= 8 && value < 9) {
-                     discreteValue = "A";
-                 } else if (value >= 9 && value < 10) {
-                     discreteValue = "S";
-                 } else {
-                     discreteValue = "S+";
-                 }
-                 writer.write(discreteValue+"\n");
-             }
-             writer.close();
-             System.out.println("Successfully wrote "+outfile);
-         }
-         catch (IOException e ){
-             e.printStackTrace();
-         }
-     }
+                writer.write(discreteValue+"\n");
+            }
+            writer.close();
+        }
+        catch(IOException e){
+            System.out.println(e.getMessage());
+        }
+    }
 
-     public ArrayList<String[]> stratifiedSample(int sampleSize, int noOfCourses){
-         HashMap<String,ArrayList<String[]>> SubjectMap = new HashMap<>();
-         for (String[] row: data.getRows()){
-             ArrayList<String[]> results = SubjectMap.get(row[0]);
-             if(results!=null){
-                 results.add(row);
-             }
-             else {
+    public ArrayList<String[]> stratifiedSample(int sampsize){
+         HashMap<String, ArrayList<String[]>> genderMap = new HashMap<>();
+         for(String row[] : data ){
+            ArrayList<String[]> results = genderMap.get(row[4]);
+            if (results != null){
+                results.add(row);
+            }
+            else {
                  results = new ArrayList<>();
                  results.add(row);
-             }
-             SubjectMap.put(row[0],results);
-         }
-         ArrayList<ArrayList<String[]>> sample = new ArrayList<>();
-         ArrayList<String> keys = new ArrayList<String>();
-         keys.addAll(SubjectMap.keySet());
-         Collections.shuffle(keys);
-         float total = 0;
-         for (int count = 0;count<noOfCourses;count++){
-             sample.add(SubjectMap.get(keys.get(count)));
-             total+=SubjectMap.get(keys.get(count)).size();
-         }
-         ArrayList<String[]> stratifiedSample = new ArrayList<>();
-         System.out.println("Stratified Sample Size: "+sampleSize);
-         System.out.println("No. of Strata: "+noOfCourses);
-         for (ArrayList<String[]> item: sample){
-             int itemSize = (int)(item.size()/total * sampleSize);
-             if(itemSize > item.size()) itemSize = item.size();
-             Collections.shuffle(item);
-             stratifiedSample.addAll(item.subList(0,itemSize));
-             System.out.println("Subject: "+item.get(0)[0]+" Strata Size: "+item.size()+" Size in Sample: "+ itemSize);
-         }
-         Collections.shuffle(stratifiedSample);
-         return stratifiedSample;
-     }
+            }
+            genderMap.put(row[4],results);
+        }
 
-     public static void main(String[] args) {
+        ArrayList<String[]> stratifiedSample = new ArrayList<>();
+
+        for(String gender: genderMap.keySet()){
+            ArrayList<String[]> items = genderMap.get(gender);
+            int class_size = items.size();
+            System.out.println("Gender: " + gender + "Class size: " + class_size)+"/"+data.size();
+            int class_samp_size = (int)Math.rint( (sampsize / (float)data.size()) * class_size );
+            System.out.println("Gender: " + gender + "Class sample size: " + class_samp_size);
+            Collections.shuffle(items);
+            for(int i = 0 ; i < class_samp_size; i++)
+                stratifiedSample.add(items.get(i));
+        }
+        return stratifiedSample;
+    }
+
+    public void aggregation(int group_col, int value_col) {
+        HashMap<String, Float[]> genderAgg = new HashMap<>();
+        for(String row[] : data ){
+            if(genderAgg.containsKey(row[group_col])){
+                Float minmax[] = genderAgg.get(row[group_col]);
+                Float value = Float.parseFloat(row[value_col]);
+                if( value < minmax[0])
+                    minmax[0] = value;
+                if( value > minmax[1])
+                    minmax[1] = value;
+
+                genderAgg.put(row[group_col], minmax);
+            }
+            else {
+                Float value = Float.parseFloat(row[value_col]);
+                genderAgg.put(row[group_col], new Float[]{value, value});
+            }
+        }
+
+        for (String key : genderAgg.keySet()){
+             Float[] value = genderAgg.get(key);
+             System.out.println("Gender: "+key+" Min: "+value[0] + " Max: " + value[1]);
+        }
+
+    }
+
+    public static void main(String args[]){
         if(args.length != 1){
-            System.out.println("Usage: preprocess <results.csv>");
+            System.out.println("Usage: java Preprocessor <input.csv>");
             return;
         }
+
         Preprocessor dataProcessor = new Preprocessor(args[0]);
-        dataProcessor.printHead();
-        dataProcessor.aggregation(0,5);
-        dataProcessor.discritize(5,"discritized.csv");
-        ArrayList<String[]> sample = dataProcessor.stratifiedSample(60,5);
-        for(String[] row : sample.subList(0,sample.size()>10?10:sample.size())) {
-             System.out.println(DataSet.printRow(row));
-         }
+        dataProcessor.aggregation(4, 2);
+        dataProcessor.discretization(5, "output.csv");
+        ArrayList<String[]> sample = dataProcessor.stratifiedSample(4);
+        Collections.shuffle(sample);
+        for(String[] row : sample) {
+             System.out.println(dataProcessor.printRow(row));
+        }
     }
 }
