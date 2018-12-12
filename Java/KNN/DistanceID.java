@@ -1,11 +1,7 @@
-import java.util.*;
-import java.io.*;
-
-public class DistanceID implements Comparable<DistanceID>
-{
-    int id;
+public class DistanceID implements Comparable<DistanceID>{
+    double id;
     double distance;
-    public DistanceID(double distance, int id){
+    public DistanceID(double distance, double id){
         this.distance = distance;
         this.id = id;
     }
@@ -18,6 +14,6 @@ public class DistanceID implements Comparable<DistanceID>
         else if(distance > d.distance)
             return 1;
         else
-            return -1;        
+            return -1;
     }
 }
