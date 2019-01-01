@@ -1,107 +1,91 @@
-import java.io.*;
 import java.util.*;
+import java.io.*;
 
-public class Preprocessor {
-
-    private ArrayList<String[]> data;
-
-    public Preprocessor(String filename){
+public class ReplaceMissingValues {
+    ArrayList<String[]> data;
+    Scanner sc;
+    ReplaceMissingValues(String filename, String delimiter) {
+        sc = new Scanner(System.in);
         data = new ArrayList<>();
-        parseCSV(filename);
-    }
-
-    public void parseCSV(String filename) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(new File(filename)));
+            BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
             String line;
-            while( (line = reader.readLine()) != null ){
-                String row[] = line.split(",");
-                data.add(row);
+            while((line = br.readLine())!=null){
+                data.add(line.split(delimiter,-1));
             }
         }
-        catch (IOException e){
-            System.out.println(e.getMessage());
+        catch(Exception e) {
+            System.out.println(e);
+            System.exit(0);
+        }
+        System.out.println("Current data");
+        printCsv();
+    }
+
+    public void printCsv() {
+        for(String[] row:data) {
+            for(String value:row) {
+                System.out.print(value+" ");
+            }
+            System.out.println();
         }
     }
 
-    public String printRow(String row[]){
-        String new_row = Arrays.toString(row);
-        return new_row.substring(1, new_row.length() - 1);
+    public void replaceContinuousAttribute() {
+        System.out.println("Enter column no to replace values in continuous attribute");
+        int colno = sc.nextInt() - 1;
+        int sum = 0,count = 0;
+        for(String[] row:data) {
+            if(row[colno].length()>0) {
+                sum += Integer.parseInt(row[colno]);
+                count++;
+            }
+        }
+        int mean = sum / count;
+        for(int i = 0;i<data.size();i++) {
+            if(data.get(i)[colno].length() == 0) {
+                data.get(i)[colno] = String.valueOf(mean);
+            }
+        }
+        System.out.println("New data");
+        printCsv();
     }
 
-    public void handleMissing (int col, String naIndicator, Boolean isNumeric,Boolean isInteger){
-        ArrayList<String[]> new_data = new ArrayList<>();
-        if (isNumeric){
-            float meanValue = 0;
-            for(String row[] : data ){
-                if(!row[col].equalsIgnoreCase(naIndicator))
-                    meanValue += Float.parseFloat(row[col]);
-            }
-            meanValue /= data.size();
-            System.out.println("Replacement for missing in col: "+ (col+1) +" is: "+ meanValue);
-   
-           for(String row[] : data ){
-                if(row[col].equalsIgnoreCase(naIndicator)){
-                    if (isInteger)
-                        row[col] = Integer.toString((int) meanValue);
-                    else
-                        row[col] = Float.toString(meanValue);
+    public void replaceCategoricalValues() {
+        System.out.println("Enter column no to replace values in categorical attribute");
+        int colno = sc.nextInt() - 1;
+        HashMap<String,Integer> hm = new HashMap<>();
+        int max = Integer.MIN_VALUE;
+        String mkey = "";
+        for(int i = 0; i<data.size(); i++) {
+            if(data.get(i)[colno].length() > 0) {
+                String key = data.get(i)[colno];
+                if(hm.containsKey(key)) {
+                    hm.put(key,hm.get(key) + 1);
                 }
-                new_data.add(row);
-            }
-        }
-        else 
-        {
-            HashMap<String,Integer> freqMatrix = new HashMap<>();
-            for(String row[] : data ){
-                if(!row[col].equalsIgnoreCase(naIndicator)){
-                    Integer count = freqMatrix.get(row[col]);
-                    if(count == null) count = new Integer(0);
-                    count++;
-                    freqMatrix.put(row[col],count);
+                else {
+                    hm.put(key,1);
                 }
             }
-            Map.Entry<String,Integer> mostFrequent = null;
-            for(Map.Entry<String,Integer> e : freqMatrix.entrySet()){
-                if (mostFrequent == null || e.getValue() > mostFrequent.getValue())
-                    mostFrequent = e;
-            }
-            System.out.println("Replacement for missing in col: "+ (col+1) +" is: "+ mostFrequent.getKey());
-            for(String row[] : data ){
-                if(row[col].equalsIgnoreCase(naIndicator)){
-                    row[col] = mostFrequent.getKey();
-                }
-                new_data.add(row);
+        }
+        for(String key:hm.keySet()) {
+            if(max < hm.get(key)) {
+                max = hm.get(key);
+                mkey = key;
             }
         }
-        data = new_data;
+        for(int i = 0;i<data.size();i++) {
+            if(data.get(i)[colno].length() == 0) {
+                data.get(i)[colno] = mkey;
+            }
+        }
+        System.out.println("New Data");
+        printCsv();
     }
 
-    public void writeCSV(String filename){
-        try{
-            FileWriter writer = new FileWriter(filename);
-            for (String[] row : data){
-                writer.write(printRow(row));
-                writer.write("\n");
-            }
-            writer.close();
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-    }
-
-
-    public static void main(String args[]){
-        if(args.length != 1){
-            System.out.println("Usage: java Preprocessor <input.csv>");
-            return;
-        }
-
-        Preprocessor processor = new Preprocessor(args[0]);
-        processor.handleMissing(1, "NA", true, true);//age
-        processor.handleMissing(5, "NA", false, false);//month
-        processor.writeCSV("afterMissing.csv");
-
+    public static void main(String[] args) {
+        ReplaceMissingValues r = new ReplaceMissingValues("data.txt",",");
+        r.replaceContinuousAttribute();
+        r.replaceCategoricalValues();
     }
 }
