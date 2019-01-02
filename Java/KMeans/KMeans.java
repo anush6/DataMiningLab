@@ -28,7 +28,7 @@ public class KMeans {
                 for(String attr : row){
                     row_double[i] = Double.parseDouble(attr);
                     i++;
-                } 
+                }
                 data.add(row_double);
             }
         }
@@ -57,7 +57,6 @@ public class KMeans {
                 cluster.add(point);
                 clusterData.put(cluster_index, cluster);
             }
-
             recomputeCentroid(clusterData);
             finalClusters = clusterData;
         }
@@ -66,7 +65,7 @@ public class KMeans {
     public ArrayList<Double> findDistanceFromAllCentroids(Double[] point) {
         ArrayList<Double> distance = new ArrayList<>();
         for(Double[] c : centroids) {
-            Double dist = EuclideanDistance(point, c);           
+            Double dist = EuclideanDistance(point, c);
             // Double dist = ManhattanDistance(point, c);
             distance.add(dist);
         }
@@ -88,12 +87,12 @@ public class KMeans {
         }
         return sum;
     }
-   
+
     public int findCluster(ArrayList<Double> distanceFromAllCentroids) {
         int index = -1;
         Double min = Double.MAX_VALUE;
-        for (Double distance: distanceFromAllCentroids){
-            if (distance < min){
+        for (Double distance: distanceFromAllCentroids) {
+            if (distance < min) {
                 min = distance;
                 index = distanceFromAllCentroids.indexOf(distance);
             }
@@ -101,12 +100,15 @@ public class KMeans {
         return index;
     }
 
-    public void recomputeCentroid(HashMap<Integer,ArrayList<Double[]>> clusterData){        
+    public void recomputeCentroid(HashMap<Integer,ArrayList<Double[]>> clusterData){
         for(Map.Entry<Integer, ArrayList<Double[]>> entry : clusterData.entrySet()) {
             ArrayList<Double[]> clusterPoints = entry.getValue();
             int clusterIndex = entry.getKey();
 
             Double[] newCentroid = new Double[dimensions];
+            for(int i = 0; i<dimensions; i++) {
+                newCentroid[i] = 0.0;
+            }
             for(Double[] point : clusterPoints){
                 for(int d = 0; d < dimensions; d++){
                     newCentroid[d] = newCentroid[d] + point[d];
@@ -117,7 +119,7 @@ public class KMeans {
                 newCentroid[d] /= clusterPoints.size();
             }
 
-            centroids.add(clusterIndex, newCentroid);
+            centroids.set(clusterIndex, newCentroid);
         }
     }
 
@@ -131,7 +133,7 @@ public class KMeans {
             System.out.println();
         }
     }
-    
+
     public void predict(Double[] test) {
         ArrayList<Double> distanceFromAllCentroids = findDistanceFromAllCentroids(test);
         int cluster_index = findCluster(distanceFromAllCentroids);
@@ -139,7 +141,7 @@ public class KMeans {
     }
 
     public static void main(String[] args)throws IOException {
-        String filename = "data.csv";
+        String filename = "data.txt";
         KMeans km = new KMeans(3, 100, filename);
         km.initCentroids();
         km.findCentroids();
@@ -147,5 +149,5 @@ public class KMeans {
         Double[] test = {2.0, 3.0, 4.5};
         km.predict(test);
     }
-    
+
 }
