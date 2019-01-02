@@ -127,9 +127,6 @@ public class Generator {
         g.printRules();
         g.setSupAndConf();
         System.out.println("Generated Frequent Rules: " );
-        ArrayList<Character> a = new ArrayList<>();
-        a.add('a');
-        System.out.println("Samp "+g.findSupport(a));
         g.printStrongRules();
     }
 }
